@@ -1,0 +1,105 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int visit[505] = { 0 };
+
+struct Point
+{
+	double x;
+	double y;
+}p[505];
+
+double det(Point a1, Point a2, Point a3)
+{
+	return a1.x * a2.y + a3.x * a1.y + a2.x * a3.y - a3.x * a2.y - a2.x * a1.y - a1.x * a3.y;
+	//计算行列式的值，判断a3在直线a1a2的哪个方向
+}
+
+bool mycmp(Point a, Point b)
+{
+	return (a.x != b.x) ? a.x < b.x : a.y < b.y;
+	//自定义比较，按x从小到大排序，若x值相同按y从小到大排序
+}
+
+void search(int first, int last)
+{
+	double cmax = 0;
+	int index = -1;
+	if (first < last)
+	{
+		for (int i = first + 1; i < last; i++)
+		{
+			double calcu = det(p[first], p[i], p[last]);//判断在左在右
+			if (calcu == 0) { visit[i] = 1; }//在直线上代表搜过，有新的也会涵盖在内
+			if (calcu > cmax)//确定行列式最大值
+			{
+				cmax = calcu;
+				index = i;
+			}
+		}
+	}
+	else
+	{
+		for (int i = first - 1; i > last; i--)
+		{
+			double calcu = det(p[first], p[i], p[last]);
+			if (calcu == 0) { visit[i] = 1; }
+			if (calcu > cmax)
+			{
+				cmax = calcu;
+				index = i;
+			}
+		}
+	}
+	if (index != -1)//如果有不在同一侧的，取最大值递归
+	{
+		visit[index] = 1;
+		search(first, index);
+		search(index, last);
+	}
+	return;
+}
+
+int main()
+{
+	int n;
+	cout << "----input----\n请输入点的个数：";
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		cout << "请输入第" << i << "个点的坐标(形如x y)：";
+		cin >> p[i].x >> p[i].y;
+	}
+	visit[1] = visit[n] = 1;
+	sort(p + 1, p + n + 1, mycmp);
+	search(1, n);
+	search(n, 1);
+	cout << "----output----\n构成凸包的点如下：\n";
+	for (int i = 0; i < n; i++)
+	{
+		if (visit[i] == 1)
+		{
+			cout << p[i].x << " " << p[i].y << endl;
+		}
+	}
+	return 0;
+}
+
+/*
+* test data:
+13
+-6.46 9.58
+1.7 12.14
+4 6
+0.92 -5.12
+-1.19 7.69
+10 2
+2.26 2.05
+-3.79 3.38
+-7.95 -2.78
+5.19 -1.22
+6.57 2.75
+-2.23 -1.14
+-8.88 4.02
+*/
