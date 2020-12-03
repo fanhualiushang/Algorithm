@@ -1,0 +1,95 @@
+#include<cstdio>
+#include<cmath>
+#pragma warning(disable:4996)
+using namespace std;
+int n;
+double ans = 100000000.0;
+int min_order[55];
+int now_order[55];
+double place[55][3];
+double G[55][55];
+bool vis[55] = { 0 };
+void DFS(int current, int count, double sum)
+{
+	//最优性剪枝:在一次深搜过程中费用sum>当前走完所有路程所需的费用ans,
+	//因此sum肯定不是最小值,不用在向下层搜索了,函数返回继续寻找另一个方案。
+	now_order[count] = current;
+	if (sum > ans) { return; }
+	if (count == n)
+	{
+		if (ans >= sum + G[current][1])
+		{
+			ans = sum + G[current][1];
+			for (int i = 1; i <= n; i++)
+			{
+				min_order[i] = now_order[i];
+			}
+		}
+	}
+	vis[current] = true;//标记本层递归已搜索过
+	for (int i = 1; i <= n; i++)
+	{
+		if (!vis[i])
+		{
+			DFS(i, count + 1, sum + G[current][i]);
+		}
+	}
+	vis[current] = false;//一次深搜完成后清除标记
+	return;
+}
+int main()
+{
+	printf("请输入城市个数(不超过50)：");
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++)
+	{
+		printf("请输入第%d个城市的坐标：", i);
+		scanf("%lf %lf", &place[i][0], &place[i][1]);
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			G[i][j] = sqrt((place[j][0] - place[i][0]) * (place[j][0] - place[i][0]) + (place[j][1] - place[i][1]) * (place[j][1] - place[i][1]));
+		}
+	}
+	printf("城市 ");
+	for (int j = 1; j <= n; j++)
+	{
+		printf("%2d    ", j);
+	}
+	printf("\n");
+	for (int i = 1; i <= n; i++)
+	{
+		printf("%2d  ", i);
+		for (int j = 1; j <= n; j++)
+		{
+			printf("%2.2lf  ", G[i][j]);
+		}
+		printf("\n");
+	}
+	DFS(1, 1, 0.0);
+
+	printf("最短距离为：%lf\n最短路径为%d", ans, min_order[1]);
+	for (int i = 2; i <= n; i++)
+	{
+		printf("->%d", min_order[i]);
+	}
+	return 0;
+}
+/*
+* test data:
+12
+3.58 5.11
+1.76 4.15
+3.22 3.43
+5.26 3.87
+5.66 2.39
+4.42 1.75
+2.26 1.87
+1.38 0.39
+-1.22 1.19
+0.82 5.75
+3.34 0.43
+5.78 0.59
+*/
