@@ -1,0 +1,80 @@
+#include<iostream>
+#include<string>
+#include<vector>
+#include <iomanip>
+using namespace std;
+
+int min(int a, int b, int c)
+{
+	int tmp = a < b ? a : b;
+	return tmp < c ? tmp : c;
+}
+
+void calcu_dis(string a, string b)
+{
+	int m = (int)a.size(), n = (int)b.size();
+	vector<vector<int> > dp(m + 1, vector<int>(n + 1, 0));//长m+1，宽n+1的二维数组
+	dp[0][0] = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		dp[i][0] = i;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		dp[0][i] = i;
+	}
+	int cost = 0, deletion = 0, insertion = 0, substitution = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		for (int j = 1; j <= n; j++)
+		{
+			cost = a[i - 1] == b[j - 1] ? 0 : 1;
+			deletion = dp[i - 1][j] + 1;
+			insertion = dp[i][j - 1] + 1;
+			substitution = dp[i - 1][j - 1] + cost;
+			dp[i][j] = min(deletion, insertion, substitution);
+		}
+	}
+	printf("这两个字符串间的编辑距离为%d\n附动态规划表：\n", dp[m][n]);
+	for (int i = -1; i <= n; i++)
+	{
+		cout << setiosflags(ios::left) << setw(4);
+		cout << (i <= 0 ? '0' : b[i - 1]);
+	}
+	cout << endl << "0   ";
+	for (int j = 0; j <= n; j++)
+	{
+		cout << setiosflags(ios::left) << setw(4);
+		cout << dp[0][j];
+	}
+	cout << endl;
+	for (int i = 1; i <= m; i++)
+	{
+		cout << setiosflags(ios::left) << setw(4);
+		cout << a[i - 1];
+		for (int j = 0; j <= n; j++)
+		{
+			cout << setiosflags(ios::left) << setw(4);
+			cout << dp[i][j];
+		}
+		cout << endl;
+	}
+	return;
+}
+
+int main()
+{
+	std::string str1, str2;
+	cout << "请输入第一个字符串：";
+	cin >> str1;
+	cout << "请输入第二个字符串：";
+	cin >> str2;
+	calcu_dis(str1, str2);
+	return 0;
+}
+
+/*
+* test data:
+wherethereislife
+thereishope
+*/
