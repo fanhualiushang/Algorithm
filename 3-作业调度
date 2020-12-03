@@ -1,0 +1,72 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int find(vector<vector<int> > v, int size) // 查询数组最快可安排的位置
+{
+	int place = 0, cmin = 9999;
+	for (int i = 1; i <= size; i++)
+	{
+		if (v[i][0] < cmin)
+		{
+			cmin = v[i][0];
+			place = i;
+		}
+	}
+	return place;
+}
+
+void cacul_time(int n, int m)//n作业数，m设备数
+{
+	vector<int> task(n + 1, 0); //task记录每个作业消耗时间
+	cout << "请依次输入每个作业消耗时间：";
+	int time = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> time;
+		task[i] = time;
+	}
+	vector<vector<int> > use(m + 1, vector<int>(2, 0)); //use记录每个设备已经使用的时间
+	sort(task.begin(), task.end());
+
+	int ans = 0;//总等待时间
+
+	for (int i = 1; i <= n; i++)
+	{
+		int place = find(use, m);
+		ans += use[place][0];
+		use[place][1] += use[place][0];
+		use[place].push_back(task[i]);
+		use[place][0] += task[i];
+	}
+	for (int i = 1; i <= m; i++)
+	{
+		cout << "设备" << i << "总时长" << use[i][0] << ",总等待时间" << use[i][1] << ",依次完成作业的时间为";
+		for (int j = 2; j <= use[i].size() - 1; j++)
+		{
+			cout << use[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << "总等待时间为" << ans;
+	return;
+}
+
+int main()
+{
+	int n, m;
+	cout << "请输入总作业数：";
+	cin >> n;
+	cout << "请输入总设备数：";
+	cin >> m;
+	cacul_time(n, m);
+	return 0;
+}
+
+/*
+* test data:
+16
+5
+16 48 29 94 51 35 11 60 73 16 49 62 19 52 37 48
+*/
