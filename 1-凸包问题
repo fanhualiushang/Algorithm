@@ -76,7 +76,7 @@ int main()
 	search(1, n);
 	search(n, 1);
 	cout << "----output----\n构成凸包的点如下：\n";
-	for (int i = 0; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		if (visit[i] == 1)
 		{
